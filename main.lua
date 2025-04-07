@@ -70,6 +70,29 @@ for _, suit in ipairs(suits) do
 end
 
 
+local igo = Game.init_game_object
+function Game:init_game_object()
+	local ret = igo(self)
+	ret.current_round.jokermostwanted = { rank = 'Ace' }
+	return ret
+end
+
+
+
+function SMODS.current_mod.reset_game_globals(run_start)
+	G.GAME.current_round.jokermostwanted = { rank = 'Ace' }
+	local valid_target_cards = {}
+	for _, v in ipairs(G.playing_cards) do
+		if not SMODS.has_no_rank(v) then -- Abstracted enhancement check for jokers being able to give cards additional enhancements
+			valid_target_cards[#valid_target_cards + 1] = v
+		end
+	end
+	if valid_target_cards[1] then
+		local target_card = pseudorandom_element(valid_target_cards, pseudoseed('mostwantedranks' .. G.GAME.round_resets.ante))
+		G.GAME.current_round.jokermostwanted.rank = target_card.base.value 
+        G.GAME.current_round.jokermostwanted.id = target_card.base.id
+	end
+end
 
 ----------------------------------------------
 ------------MOD CODE END----------------------
